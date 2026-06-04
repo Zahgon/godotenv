@@ -14,27 +14,13 @@
 package godotenv
 
 import (
-	"bytes"
-	"fmt"
 	"io"
-	"os"
-	"os/exec"
-	"sort"
-	"strings"
 )
 
 const doubleQuoteSpecialChars = "\\\n\r\"!$`"
 
 // Parse reads an env file from io.Reader, returning a map of keys and values.
-func Parse(r io.Reader) (map[string]string, error) {
-	var buf bytes.Buffer
-	_, err := io.Copy(&buf, r)
-	if err != nil {
-		return nil, err
-	}
-
-	return UnmarshalBytes(buf.Bytes())
-}
+func Parse(r io.Reader) (map[string]string, error) { _ = "STUB: not implemented"; return nil, nil }
 
 // Load will read your env file(s) and load them into ENV for this process.
 //
@@ -47,17 +33,9 @@ func Parse(r io.Reader) (map[string]string, error) {
 //	godotenv.Load("fileone", "filetwo")
 //
 // It's important to note that it WILL NOT OVERRIDE an env variable that already exists - consider the .env file to set dev vars or sensible defaults.
-func Load(filenames ...string) (err error) {
-	filenames = filenamesOrDefault(filenames)
+func Load(filenames ...string) (err error) { _ = "STUB: not implemented"; return nil }
 
-	for _, filename := range filenames {
-		err = loadFile(filename, false)
-		if err != nil {
-			return // return early on a spazout
-		}
-	}
-	return
-}
+// return early on a spazout
 
 // Overload will read your env file(s) and load them into ENV for this process.
 //
@@ -70,51 +48,29 @@ func Load(filenames ...string) (err error) {
 //	godotenv.Overload("fileone", "filetwo")
 //
 // It's important to note this WILL OVERRIDE an env variable that already exists - consider the .env file to forcefully set all vars.
-func Overload(filenames ...string) (err error) {
-	filenames = filenamesOrDefault(filenames)
+func Overload(filenames ...string) (err error) { _ = "STUB: not implemented"; return nil }
 
-	for _, filename := range filenames {
-		err = loadFile(filename, true)
-		if err != nil {
-			return // return early on a spazout
-		}
-	}
-	return
-}
+// return early on a spazout
 
 // Read all env (with same file loading semantics as Load) but return values as
 // a map rather than automatically writing values into env
 func Read(filenames ...string) (envMap map[string]string, err error) {
-	filenames = filenamesOrDefault(filenames)
-	envMap = make(map[string]string)
-
-	for _, filename := range filenames {
-		individualEnvMap, individualErr := readFile(filename)
-
-		if individualErr != nil {
-			err = individualErr
-			return // return early on a spazout
-		}
-
-		for key, value := range individualEnvMap {
-			envMap[key] = value
-		}
-	}
-
-	return
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// return early on a spazout
 
 // Unmarshal reads an env file from a string, returning a map of keys and values.
 func Unmarshal(str string) (envMap map[string]string, err error) {
-	return UnmarshalBytes([]byte(str))
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // UnmarshalBytes parses env file from byte slice of chars, returning a map of keys and values.
 func UnmarshalBytes(src []byte) (map[string]string, error) {
-	out := make(map[string]string)
-	err := parseBytes(src, out)
-
-	return out, err
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // Exec loads env vars from the specified filenames (empty map falls back to default)
@@ -125,123 +81,29 @@ func UnmarshalBytes(src []byte) (map[string]string, error) {
 // If you want more fine grained control over your command it's recommended
 // that you use `Load()`, `Overload()` or `Read()` and the `os/exec` package yourself.
 func Exec(filenames []string, cmd string, cmdArgs []string, overload bool) error {
-	op := Load
-	if overload {
-		op = Overload
-	}
-	if err := op(filenames...); err != nil {
-		return err
-	}
-
-	command := exec.Command(cmd, cmdArgs...)
-	command.Stdin = os.Stdin
-	command.Stdout = os.Stdout
-	command.Stderr = os.Stderr
-	return command.Run()
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Write serializes the given environment and writes it to a file.
-func Write(envMap map[string]string, filename string) error {
-	content, err := Marshal(envMap)
-	if err != nil {
-		return err
-	}
-	file, err := os.Create(filename)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-	_, err = file.WriteString(content + "\n")
-	if err != nil {
-		return err
-	}
-	return file.Sync()
-}
+func Write(envMap map[string]string, filename string) error { _ = "STUB: not implemented"; return nil }
 
 // isInt checks if the string may be serialized as a number value, leading
 // "-" symbol is allowed for negative numbers, leading "+" sign is not. The
 // length of the value is not limited.
-func isInt(s string) bool {
-	s = strings.TrimPrefix(s, "-")
-
-	if len(s) == 0 {
-		return false
-	}
-
-	for _, r := range s {
-		if '0' <= r && r <= '9' {
-			continue
-		}
-		return false
-	}
-
-	return true
-}
+func isInt(s string) bool { _ = "STUB: not implemented"; return false }
 
 // Marshal outputs the given environment as a dotenv-formatted environment file.
 // Each line is in the format: KEY="VALUE" where VALUE is backslash-escaped.
-func Marshal(envMap map[string]string) (string, error) {
-	lines := make([]string, 0, len(envMap))
-	for k, v := range envMap {
-		if isInt(v) {
-			lines = append(lines, fmt.Sprintf(`%s=%s`, k, v))
-		} else {
-			lines = append(lines, fmt.Sprintf(`%s="%s"`, k, doubleQuoteEscape(v)))
-		}
-	}
-	sort.Strings(lines)
-	return strings.Join(lines, "\n"), nil
-}
+func Marshal(envMap map[string]string) (string, error) { _ = "STUB: not implemented"; return "", nil }
 
-func filenamesOrDefault(filenames []string) []string {
-	if len(filenames) == 0 {
-		return []string{".env"}
-	}
-	return filenames
-}
+func filenamesOrDefault(filenames []string) []string { _ = "STUB: not implemented"; return nil }
 
-func loadFile(filename string, overload bool) error {
-	envMap, err := readFile(filename)
-	if err != nil {
-		return err
-	}
-
-	currentEnv := map[string]bool{}
-	rawEnv := os.Environ()
-	for _, rawEnvLine := range rawEnv {
-		key := strings.Split(rawEnvLine, "=")[0]
-		currentEnv[key] = true
-	}
-
-	for key, value := range envMap {
-		if !currentEnv[key] || overload {
-			_ = os.Setenv(key, value)
-		}
-	}
-
-	return nil
-}
+func loadFile(filename string, overload bool) error { _ = "STUB: not implemented"; return nil }
 
 func readFile(filename string) (envMap map[string]string, err error) {
-	file, err := os.Open(filename)
-	if err != nil {
-		return
-	}
-	defer file.Close()
-
-	return Parse(file)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func doubleQuoteEscape(line string) string {
-	for _, c := range doubleQuoteSpecialChars {
-		toReplace := "\\" + string(c)
-		if c == '\n' {
-			toReplace = `\n`
-		}
-		if c == '\r' {
-			toReplace = `\r`
-		}
-		line = strings.ReplaceAll(line, string(c), toReplace)
-	}
-	return line
-}
+func doubleQuoteEscape(line string) string { _ = "STUB: not implemented"; return "" }
